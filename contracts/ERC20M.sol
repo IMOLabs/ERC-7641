@@ -10,6 +10,11 @@ import "./IERC20M.sol";
 
 contract ERC20M is ERC20Snapshot, IERC20M {
     /**
+     * @dev immutable variable for a model id in string defined in the constructor
+     */
+    bytes32 public immutable modelId;
+
+    /**
      * @dev mapping from snapshot id to the deposited ETH amount.
      */
     mapping (uint256 => uint256) private _depositAtSnapshot;
@@ -24,8 +29,9 @@ contract ERC20M is ERC20Snapshot, IERC20M {
      * @param symbol The symbol of the token
      * @param supply The total supply of the token
      */
-    constructor(string memory name, string memory symbol, uint256 supply) ERC20(name, symbol) {
+    constructor(string memory name, string memory symbol, uint256 supply, string memory modelUri) ERC20(name, symbol) {
         _mint(msg.sender, supply);
+        modelId = keccak256(abi.encodePacked(modelUri));
     }
 
     /**

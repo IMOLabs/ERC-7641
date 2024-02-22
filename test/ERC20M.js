@@ -11,7 +11,7 @@ describe("ERC20M", function () {
   beforeEach(async function () {
     [addr0, addr1, addr2, ...addrs] = await ethers.getSigners();
     const ERC20M = await ethers.getContractFactory("ERC20M");
-    erc20m = await ERC20M.deploy("ERC20M", "ERCM", 1000000);
+    erc20m = await ERC20M.deploy("ERC20M", "ERCM", 1000000, "ipfs://mock");
     await erc20m.waitForDeployment();
     erc20mAddress = await erc20m.getAddress();
   });
@@ -27,6 +27,11 @@ describe("ERC20M", function () {
 
     it("Should set the right total supply", async function () {
       expect(await erc20m.totalSupply()).to.equal(1000000);
+    });
+
+    it("Should set the right modelId", async function () {
+      // modelId is the keccak256 hash of the modelUri
+      expect(await erc20m.modelId()).to.equal("0x1ef3c7282aaf71b1fe58e147f0f74c752821a405fccdddabee1f579a3c935348");
     });
 
     it("Should assign the total supply to the owner", async function () {
