@@ -8,6 +8,8 @@ import "./IERC20M.sol";
  * @dev An extension of the ERC20 standard that accepts ETH into the contract and adds a claim function to withdraw the ETH based on the token balance snapshotted at the time of the deposit. Should premint the total supply to the contract creator.
 */
 
+// TODO: burning mechanism
+
 contract ERC20M is ERC20Snapshot, IERC20M {
     /**
      * @dev immutable variable for a model id in string defined in the constructor
@@ -66,13 +68,15 @@ contract ERC20M is ERC20Snapshot, IERC20M {
         (bool success, ) = msg.sender.call{value: claimableAmount}("");
         require(success, "ERC20M: claim failed");
     }
+    
+    // TODO: add claim by list of snapshot ids function
 
     /**
      * @dev receive() function for the contract to accept ETH, should snapshot the token balance of the sender at the time of deposit.
      */
     receive() external payable virtual override {
         require(msg.value > 0, "ERC20M: no ETH to deposit");
-        _snapshot();
+        _snapshot(); // TODO: move snapshot to _beforeTokenTransfer
         _depositAtSnapshot[_getCurrentSnapshotId()] += msg.value;
         emit Deposit(_getCurrentSnapshotId(), msg.value);
     }
