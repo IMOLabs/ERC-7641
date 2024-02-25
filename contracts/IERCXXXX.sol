@@ -4,9 +4,9 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @dev An interface for ERC20M, an extension of the ERC20 standard that accepts ETH into the contract and adds a claim function to withdraw the ETH based on the token balance.
+ * @dev An interface for ERCXXXX, an extension of the ERC20 standard that accepts ETH into the contract and adds a claim function to withdraw the ETH based on the token balance.
  */
-interface IERC20M is IERC20 {
+interface IERCXXXX is IERC20 {
     /**
      * @dev event for the deposit of ETH, recording snapshot ID and the amount of ETH deposited.
      */

@@ -1,3 +1,3 @@
-# ERC20M
+# ERCXXXX
 
 TODO: Add README
