@@ -67,7 +67,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXXAltToken {
      * @param snapshotId The snapshot id
      * @return The amount of revenue token claimable
      */
-    function claimable(address account, uint256 snapshotId) public view virtual override returns (uint256) {
+    function claimableRevenue(address account, uint256 snapshotId) public view virtual override returns (uint256) {
         require(snapshotId > 0, "ERCXXXX: id is 0");
         require(snapshotId <= _getCurrentSnapshotId(), "ERCXXXX: nonexistent id");
 
@@ -106,7 +106,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXXAltToken {
                 IERC20(revenueTokens[i]).transfer(msg.sender, claimableAmount);
             }
         }
-        uint256 claimableETH = claimable(msg.sender, snapshotId);
+        uint256 claimableETH = claimableRevenue(msg.sender, snapshotId);
         if (claimableETH > 0) {
             (bool success, ) = msg.sender.call{value: claimableETH}("");
             require(success, "ERCXXXX: ETH transfer failed");
@@ -165,22 +165,41 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXXAltToken {
     }
 
     /**
+     * @dev A function to calculate the amount of ETH redeemable by a token holder upon burn
+     * @param amount The amount of token to burn
+     * @return The amount of revenue ETH redeemable
+     */
+    function redeemableOnBurn(uint256 amount) public view virtual override returns (uint256) {
+        return _burnPool[address(0)] * amount / totalSupply();
+    }
+
+
+    /**
+     * @dev A function to calculate the amount of ETH redeemable by a token holder upon burn
+     * @param amount The amount of token to burn
+     * @param token The address of the revenue token
+     * @return The amount of revenue token redeemable
+     */
+    function redeemableERC20OnBurn(uint256 amount, address token) public view returns (uint256) {
+        return _burnPool[token] * amount / totalSupply();
+    }
+
+    /**
      * @dev A function to burn tokens and redeem the corresponding amount of revenue token
      * @param amount The amount of token to burn
      */
     function burn(uint256 amount) public virtual override {
         _burn(msg.sender, amount);
         for (uint256 i = 0; i < revenueTokens.length; i++) {
-            uint256 redeemAmount = _burnPool[revenueTokens[i]] * amount / totalSupply();
+            uint256 redeemAmount = redeemableERC20OnBurn(amount, revenueTokens[i]);
             _burnPool[revenueTokens[i]] -= redeemAmount;
             IERC20(revenueTokens[i]).transfer(msg.sender, redeemAmount);
         }
-        uint256 redeemETH = _burnPool[address(0)] * amount / totalSupply();
+        uint256 redeemETH = redeemableOnBurn(amount);
         _burnPool[address(0)] -= redeemETH;
         (bool success, ) = msg.sender.call{value: redeemETH}("");
         require(success, "ERCXXXX: ETH transfer failed");
     }
-    // ?: need public view function for redemption?
 
     receive() external payable {}
 }

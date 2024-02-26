@@ -14,7 +14,7 @@ interface IERCXXXX is IERC20 {
      * @param snapshotId The snapshot id
      * @return The amount of revenue token claimable
      */
-    function claimable(address account, uint256 snapshotId) external view returns (uint256);
+    function claimableRevenue(address account, uint256 snapshotId) external view returns (uint256);
 
     /**
      * @dev A function for token holder to claim ETH based on the token balance at certain snapshot.
@@ -28,6 +28,13 @@ interface IERCXXXX is IERC20 {
      * @notice Should have `require` to avoid ddos attack
      */
     function snapshot() external returns (uint256);
+
+    /**
+     * @dev A function to calculate the amount of ETH redeemable by a token holder upon burn
+     * @param amount The amount of token to burn
+     * @return The amount of revenue ETH redeemable
+     */
+    function redeemableOnBurn(uint256 amount) external view returns (uint256);
 
     /**
      * @dev A function to burn tokens and redeem the corresponding amount of revenue token

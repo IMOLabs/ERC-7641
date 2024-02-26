@@ -11,7 +11,7 @@ describe("ERCXXXX", function () {
   beforeEach(async function () {
     [addr0, addr1, addr2, ...addrs] = await ethers.getSigners();
     const ERCXXXX = await ethers.getContractFactory("ERCXXXX");
-    ercXXXX = await ERCXXXX.deploy("ERCXXXX", "ERCX", 1000000);
+    ercXXXX = await ERCXXXX.deploy("ERCXXXX", "ERCX", 1000000, 50);
     await ercXXXX.waitForDeployment();
     ercXXXXAddress = await ercXXXX.getAddress();
   });
