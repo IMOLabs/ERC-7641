@@ -18,7 +18,7 @@ interface IERCXXXXAltToken is IERCXXXX {
     function claimableERC20(address account, uint256 snapshotId, address token) external view returns (uint256);
 
     /**
-     * @dev A function to calculate the amount of ETH redeemable by a token holder upon burn
+     * @dev A function to calculate the amount of ERC20 redeemable by a token holder upon burn
      * @param amount The amount of token to burn
      * @param token The address of the revenue token
      * @return The amount of revenue token redeemable
