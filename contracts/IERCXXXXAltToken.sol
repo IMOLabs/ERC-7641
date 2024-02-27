@@ -24,10 +24,4 @@ interface IERCXXXXAltToken is IERCXXXX {
      * @return The amount of revenue token redeemable
      */
     function redeemableERC20OnBurn(uint256 amount, address token) external view returns (uint256);
-
-    /**
-     * @dev A function to add a revenue token address
-     * @param token The address of the revenue token
-     */
-    function addRevenueToken(address token) external;
 }
