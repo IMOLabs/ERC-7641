@@ -101,7 +101,8 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
         uint256 snapshotId = _snapshot();
         _lastSnapshotBlock = block.number;
         
-        uint256 newRevenue = address(this).balance - _claimPool - _burnPool;
+        uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
+
         uint256 claimableETH = newRevenue * percentClaimable / 100;
         _claimableAtSnapshot[snapshotId] = claimableETH;
         _claimPool += claimableETH;
@@ -130,8 +131,8 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      */
     function burn(uint256 amount) public {
         uint256 totalSupply = totalSupply();
-        uint256 newRevenue = address(this).balance +_burned - _claimPool - _burnPool;
-        uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
+        uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
+        uint256 burnableFromNewRevenue = amount * (newRevenue * (100 - percentClaimable) - _burned * 100)  / 100 / totalSupply;
         uint256 burnableFromPool = amount * _burnPool / totalSupply;
         _burnPool -= burnableFromPool;
         _burned += burnableFromNewRevenue;
