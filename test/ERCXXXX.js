@@ -142,5 +142,34 @@ describe("ERCXXXX", function () {
       expect(balanceAfter0-balanceBefore0).to.greaterThan(ethers.parseEther("1000")*BigInt(supply-100000)*BigInt(percentClaimable)/BigInt(100)/BigInt(supply)-gas);
       expect(balanceAfter1-balanceBefore1).to.greaterThan(ethers.parseEther("1000")*BigInt(100000)*BigInt(percentClaimable)/BigInt(100)/BigInt(supply)-gas);
     });
+
+    it("Should claim multiple snapshots correctly", async function () {
+      await addr0.sendTransaction({ to: ercXXXXAddress, value: ethers.parseEther("1000") });
+      await network.provider.send("hardhat_mine", ["0x400"]);
+      await ercXXXX.snapshot();
+      await addr0.sendTransaction({ to: ercXXXXAddress, value: ethers.parseEther("2000") });
+      await network.provider.send("hardhat_mine", ["0x400"]);
+      await ercXXXX.snapshot();
+      expect(await ercXXXX.claimableRevenue(addr0, 1)).to.equal(ethers.parseEther("1000")*BigInt(percentClaimable)/BigInt(100));
+      expect(await ercXXXX.claimableRevenue(addr0, 2)).to.equal(ethers.parseEther("2000")*BigInt(percentClaimable)/BigInt(100));
+      const balanceBefore = await ethers.provider.getBalance(await ethers.provider.getSigner(0));
+      await ercXXXX.claimBatch([1, 2]);
+      const balanceAfter = await ethers.provider.getBalance(await ethers.provider.getSigner(0));
+      expect(balanceAfter-balanceBefore).to.greaterThan(ethers.parseEther("3000")*BigInt(percentClaimable)/BigInt(100)-gas);
+    });
+  });
+
+  describe("Mixed operations", function () {
+    it("deposit -> snapshot -> deposit -> burn -> deposit -> burn -> snapshot -> claim -> burn", async function () {
+      await addr0.sendTransaction({ to: ercXXXXAddress, value: ethers.parseEther("100") });
+      await network.provider.send("hardhat_mine", ["0x400"]);
+      await ercXXXX.snapshot();
+      await addr0.sendTransaction({ to: ercXXXXAddress, value: ethers.parseEther("100") });
+      const redeemed = ethers.parseEther("200")*BigInt(10000)*BigInt(100-percentClaimable)/BigInt(supply)/BigInt(100)
+      expect(await ercXXXX.redeemableOnBurn(10000)).to.equal(redeemed);
+      await ercXXXX.burn(10000);
+      await addr0.sendTransaction({ to: ercXXXXAddress, value: ethers.parseEther("100") });
+      expect(await ercXXXX.redeemableOnBurn(10000)).to.equal(redeemed + ethers.parseEther("100")*BigInt(10000)*BigInt(100-percentClaimable)/BigInt(supply-10000)/BigInt(100));
+    });
   });
 });

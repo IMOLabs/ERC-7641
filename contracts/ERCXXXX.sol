@@ -24,7 +24,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
     /**
      * @dev mapping from snapshot id to a boolean indicating whether the address has claimed the revenue.
      */
-    mapping (uint256 => mapping(address => bool)) private _claimedAtSnapshot;
+    mapping (uint256 => mapping (address => bool)) private _claimedAtSnapshot;
 
     /**
      * @dev claim pool
@@ -37,7 +37,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
     uint256 private _burnPool;
 
     /**
-     * @dev burned since last snapshot
+     * @dev burned from new revenue
      */
     uint256 private _burned;
 
@@ -105,7 +105,8 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
         uint256 claimableETH = newRevenue * percentClaimable / 100;
         _claimableAtSnapshot[snapshotId] = claimableETH;
         _claimPool += claimableETH;
-        _burnPool += newRevenue - claimableETH;
+        _burnPool += newRevenue - claimableETH - _burned;
+        _burned = 0;
 
         return snapshotId;
     }
@@ -118,7 +119,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
     function redeemableOnBurn(uint256 amount) public view returns (uint256) {
         uint256 totalSupply = totalSupply();
         uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
-        uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
+        uint256 burnableFromNewRevenue = amount * (newRevenue * (100 - percentClaimable) - _burned * 100) / 100 / totalSupply;
         uint256 burnableFromPool = amount * _burnPool / totalSupply;
         return burnableFromNewRevenue + burnableFromPool;
     }
@@ -129,10 +130,11 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      */
     function burn(uint256 amount) public virtual override {
         uint256 totalSupply = totalSupply();
-        uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
+        uint256 newRevenue = address(this).balance +_burned - _claimPool - _burnPool;
         uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
         uint256 burnableFromPool = amount * _burnPool / totalSupply;
         _burnPool -= burnableFromPool;
+        _burned += burnableFromNewRevenue;
         _burn(msg.sender, amount);
         (bool success, ) = msg.sender.call{value: burnableFromNewRevenue + burnableFromPool}("");
         require(success, "ERCXXXX: burn failed");
