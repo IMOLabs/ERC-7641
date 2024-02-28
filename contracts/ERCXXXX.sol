@@ -37,6 +37,11 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
     uint256 private _burnPool;
 
     /**
+     * @dev burned since last snapshot
+     */
+    uint256 private _burned;
+
+    /**
      * @dev Constructor for the ERCXXXX contract, premint the total supply to the contract creator.
      * @param name The name of the token
      * @param symbol The symbol of the token
@@ -112,8 +117,10 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      */
     function redeemableOnBurn(uint256 amount) public view returns (uint256) {
         uint256 totalSupply = totalSupply();
-        uint256 ethBurnable = address(this).balance - _claimPool;
-        return amount * ethBurnable / totalSupply;
+        uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
+        uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
+        uint256 burnableFromPool = amount * _burnPool / totalSupply;
+        return burnableFromNewRevenue + burnableFromPool;
     }
 
     /**
@@ -121,11 +128,13 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @param amount The amount of token to burn
      */
     function burn(uint256 amount) public virtual override {
-        uint256 ethBurnable = address(this).balance - _claimPool;
-        uint256 burnableETH = amount * ethBurnable / totalSupply();
-        _burnPool -= burnableETH; // !: might be negative
+        uint256 totalSupply = totalSupply();
+        uint256 newRevenue = address(this).balance + _burned - _claimPool - _burnPool;
+        uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
+        uint256 burnableFromPool = amount * _burnPool / totalSupply;
+        _burnPool -= burnableFromPool;
         _burn(msg.sender, amount);
-        (bool success, ) = msg.sender.call{value: burnableETH}("");
+        (bool success, ) = msg.sender.call{value: burnableFromNewRevenue + burnableFromPool}("");
         require(success, "ERCXXXX: burn failed");
     }
 
