@@ -60,7 +60,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @param snapshotId The snapshot id
      * @return The amount of revenue token claimable
      */
-    function claimableRevenue(address account, uint256 snapshotId) public view virtual override returns (uint256) {
+    function claimableRevenue(address account, uint256 snapshotId) public view returns (uint256) {
         uint256 balance = balanceOfAt(account, snapshotId);
         uint256 totalSupply = totalSupplyAt(snapshotId);
         uint256 ethClaimable = _claimableAtSnapshot[snapshotId];
@@ -71,7 +71,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @dev A function for token holder to claim revenue token based on the token balance at certain snapshot.
      * @param snapshotId The snapshot id
      */
-    function claim(uint256 snapshotId) public virtual {
+    function claim(uint256 snapshotId) public {
         uint256 claimableETH = claimableRevenue(msg.sender, snapshotId);
         require(claimableETH > 0, "ERCXXXX: no claimable ETH");
 
@@ -85,7 +85,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @dev A function to claim by a list of snapshot ids.
      * @param snapshotIds The list of snapshot ids
      */
-    function claimBatch(uint256[] memory snapshotIds) public virtual {
+    function claimBatch(uint256[] memory snapshotIds) public {
         for (uint256 i = 0; i < snapshotIds.length; i++) {
             claim(snapshotIds[i]);
         }
@@ -96,7 +96,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @return The snapshot id
      * @notice example requirement: only 1000 blocks after the last snapshot
      */
-    function snapshot() public virtual returns (uint256) {
+    function snapshot() public returns (uint256) {
         require(block.number - _lastSnapshotBlock > 1000, "ERCXXXX: snapshot interval is too short");
         uint256 snapshotId = _snapshot();
         _lastSnapshotBlock = block.number;
@@ -128,7 +128,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @dev A function to burn tokens and redeem the corresponding amount of revenue token
      * @param amount The amount of token to burn
      */
-    function burn(uint256 amount) public virtual override {
+    function burn(uint256 amount) public {
         uint256 totalSupply = totalSupply();
         uint256 newRevenue = address(this).balance +_burned - _claimPool - _burnPool;
         uint256 burnableFromNewRevenue = amount * newRevenue * (100 - percentClaimable) / 100 / totalSupply;
