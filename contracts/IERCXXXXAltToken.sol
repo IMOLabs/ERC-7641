@@ -4,8 +4,7 @@ pragma solidity ^0.8.24;
 import "./IERCXXXX.sol";
 
 /**
- * @dev An optional extension of the ERCXXXX standard that accepts other ERC20 revenue tokens into the contract with corresponding claim function, and function to add accepted revenue tokens.
- * TODO: refine this
+ * @dev An optional extension of the ERCXXXX standard that accepts other ERC20 revenue tokens into the contract with corresponding claim function
  */
 interface IERCXXXXAltToken is IERCXXXX {
     /**

@@ -4,8 +4,7 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @dev An interface for ERCXXXX, an extension of the ERC20 standard that accepts revenue tokens into the contract and adds a claim function to withdraw the revenue based on the token balance snapshotted. Only accepts ETH for the base interface.
- * TODO: refine this
+ * @dev An interface for ERCXXXX, an ERC-20 extension that integrates a revenue-sharing mechanism, ensuring tokens intrinsically represent a share of a communal revenue pool
  */
 interface IERCXXXX is IERC20 {
     /**
