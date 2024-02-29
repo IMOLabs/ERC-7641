@@ -3,9 +3,9 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IERCXXXX.sol";
+import "./IERC7641.sol";
 
-contract ERCXXXX is ERC20Snapshot, IERCXXXX {
+contract ERC7641 is ERC20Snapshot, IERC7641 {
     /**
      * @dev last snapshotted block
      */
@@ -42,13 +42,13 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
     uint256 private _burned;
 
     /**
-     * @dev Constructor for the ERCXXXX contract, premint the total supply to the contract creator.
+     * @dev Constructor for the ERC7641 contract, premint the total supply to the contract creator.
      * @param name The name of the token
      * @param symbol The symbol of the token
      * @param supply The total supply of the token
      */
     constructor(string memory name, string memory symbol, uint256 supply, uint256 _percentClaimable) ERC20(name, symbol) {
-        require(_percentClaimable <= 100, "ERCXXXX: percentage claimable should be less than 100");
+        require(_percentClaimable <= 100, "ERC7641: percentage claimable should be less than 100");
         percentClaimable = _percentClaimable;
         _lastSnapshotBlock = block.number;
         _mint(msg.sender, supply);
@@ -73,12 +73,12 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      */
     function claim(uint256 snapshotId) public {
         uint256 claimableETH = claimableRevenue(msg.sender, snapshotId);
-        require(claimableETH > 0, "ERCXXXX: no claimable ETH");
+        require(claimableETH > 0, "ERC7641: no claimable ETH");
 
         _claimedAtSnapshot[snapshotId][msg.sender] = true;
         _claimPool -= claimableETH;
         (bool success, ) = msg.sender.call{value: claimableETH}("");
-        require(success, "ERCXXXX: claim failed");
+        require(success, "ERC7641: claim failed");
     }
     
     /**
@@ -97,7 +97,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
      * @notice example requirement: only 1000 blocks after the last snapshot
      */
     function snapshot() public returns (uint256) {
-        require(block.number - _lastSnapshotBlock > 1000, "ERCXXXX: snapshot interval is too short");
+        require(block.number - _lastSnapshotBlock > 1000, "ERC7641: snapshot interval is too short");
         uint256 snapshotId = _snapshot();
         _lastSnapshotBlock = block.number;
         
@@ -138,7 +138,7 @@ contract ERCXXXX is ERC20Snapshot, IERCXXXX {
         _burned += burnableFromNewRevenue;
         _burn(msg.sender, amount);
         (bool success, ) = msg.sender.call{value: burnableFromNewRevenue + burnableFromPool}("");
-        require(success, "ERCXXXX: burn failed");
+        require(success, "ERC7641: burn failed");
     }
 
     receive() external payable {}

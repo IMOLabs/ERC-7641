@@ -1,3 +1,3 @@
-# ERCXXXX: Intrinsic RevShare Token
+# ERC7641: Intrinsic RevShare Token
 
 TODO: Add README

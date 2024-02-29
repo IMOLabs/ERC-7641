@@ -4,9 +4,9 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @dev An interface for ERCXXXX, an ERC-20 extension that integrates a revenue-sharing mechanism, ensuring tokens intrinsically represent a share of a communal revenue pool
+ * @dev An interface for ERC-7641, an ERC-20 extension that integrates a revenue-sharing mechanism, ensuring tokens intrinsically represent a share of a communal revenue pool
  */
-interface IERCXXXX is IERC20 {
+interface IERC7641 is IERC20 {
     /**
      * @dev A function to calculate the amount of ETH claimable by a token holder at certain snapshot.
      * @param account The address of the token holder
