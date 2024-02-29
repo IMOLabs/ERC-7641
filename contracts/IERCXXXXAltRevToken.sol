@@ -6,7 +6,7 @@ import "./IERCXXXX.sol";
 /**
  * @dev An optional extension of the ERCXXXX standard that accepts other ERC20 revenue tokens into the contract with corresponding claim function
  */
-interface IERCXXXXAltToken is IERCXXXX {
+interface IERCXXXXAltRevToken is IERCXXXX {
     /**
      * @dev A function to calculate the amount of ERC20 claimable by a token holder at certain snapshot.
      * @param account The address of the token holder
